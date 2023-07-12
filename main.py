@@ -16,8 +16,8 @@ def print_menu(dict_menu, ind_pos: int=0) ->None:
             continue
         print("   {} {}".format(str(i+1) + '.', dict_menu[i][0]))
 
-def receive_pos(ind_pos: int=0) ->tuple:
-    min_ind, max_ind = 0, 5
+def receive_pos(ind_pos: int, max_ind: int) ->tuple:
+    min_ind = 0
 
     while True:
         direct = input(" ")
@@ -64,6 +64,25 @@ def search_name(name_search: str, contacts: dict) -> str:
             return name
         else:
             return ''
+def mob_num_print(name_del: str, contacts: dict, ind_pos: int) ->None:
+    print(name_del, ":")
+    for i in range(len(contacts[name_del])):
+        if i == ind_pos:
+            print("->\t", contacts[name_del][i])
+            continue
+        print("\t", contacts[name_del][i])
+
+def mob_num_del(name_del: str, contacts: dict) ->int:
+    ind = 0
+    while True:
+        mob_num_print(name_del, contacts, ind)
+        print(" \"w\" - Down, \"s\" - Up: ->", end='')
+        ind, action = receive_pos(ind, len(contacts[name_del])-1)
+        os.system('CLS')
+
+        if not action:
+            return ind
+
 
 #=====================menu main functions==================#
 
@@ -153,35 +172,13 @@ def delete_contacts(contacts: dict) ->None:
         if not name_del:
             print("\t\tis absent!")
         else:
-            if type(contacts[name_del]) == dict:
-                print(name_del, ":")
-                for ph in contacts[name_del]:
-                    print("\t", ph, "\t", contacts[name_del][ph])
-                while True:
-                    ph_type = input("enter type phone -> ")
-                    if contacts[name_del].get(ph_type, False):
-                        print("DELETE! ->", end='')
-                        print(ph_type, " : ", contacts[name_del][ph_type])
-                        del contacts[name_del][ph_type]
-                        break
-                    else:
-                        print("enter correct type as:")
-                        for i in contacts[name_del]:
-                            print("\t\t\t", i)
+            if type(contacts[name_del]) == list:
+                while len(contacts[name_del]):
+                    del contacts[name_del][mob_num_del(name_del, contacts)]
+                    print("mobile delete:")
+                    if not input("\n\tcontinue -> "):
+                        os.system('CLS')
                         continue
-            elif type(contacts[name_del]) == list:
-                ph_pos: int = 0
-                print(name_del, ":")
-                for ind in contacts[name_del]:
-                    ph_pos += 1
-                    print("\t\t", ph_pos, " -> ", ind)
-                while True:
-                    ph_num = int(input("enter phone Pos. delete -> "))
-                    if ph_num > ph_pos:
-                        print("\nN phone is out of range")
-                        continue
-                    print("DELETE! -> phone {}: {}".format(ph_num, contacts[name_del][ph_num - 1]))
-                    del contacts[name_del][ph_num - 1]
                     break
             else:
                 del contacts[name_del]
@@ -189,6 +186,7 @@ def delete_contacts(contacts: dict) ->None:
         if not input("\n\tcontinue -> "):
             os.system('CLS')
             continue
+        os.system('CLS')
         break
 
 def exit_function(contacts: dict) ->bool:
@@ -199,9 +197,9 @@ def exit_function(contacts: dict) ->bool:
 ind_menu: int=0
 strTxt: str = ''
 #Data
-data = {"Kostiantyn": {"mob": "+38-073-340-90-97", "home": "+38-056-790-53-45", "work": "+38-044-750-23-40"},
-            "Margarita": ["+38-096-835-60-27", "+38-096-440-19-46"],
-            "Dariya": "+38-066-645-98-81"
+data = {"Kostiantyn": ["+38-073-340-90-97", "+38-056-790-53-45", "+38-044-750-23-40"],
+         "Margarita": ["+38-096-835-60-27", "+38-096-440-19-46"],
+         "Dariya": "+38-066-645-98-81"
 }
 
 menu_f = {
@@ -216,7 +214,7 @@ menu_f = {
 while True:
     print_menu(menu_f, ind_menu)
     print(" \"w\" - Down, \"s\" - Up: ->", end='')
-    ind_menu, operation = receive_pos(ind_menu)
+    ind_menu, operation = receive_pos(ind_menu, len(menu_f)-1)
     os.system('CLS')
 
     if not operation:
