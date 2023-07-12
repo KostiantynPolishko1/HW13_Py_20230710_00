@@ -62,8 +62,9 @@ def search_name(name_search: str, contacts: dict) -> str:
         name_temp = name.lower()
         if name_temp.find(name_search) != -1:
             return name
-        else:
-            return ''
+
+    return ''
+
 def mob_num_print(name_del: str, contacts: dict, ind_pos: int) ->None:
     print(name_del, ":")
     for i in range(len(contacts[name_del])):
@@ -72,7 +73,7 @@ def mob_num_print(name_del: str, contacts: dict, ind_pos: int) ->None:
             continue
         print("\t", contacts[name_del][i])
 
-def mob_num_del(name_del: str, contacts: dict) ->int:
+def mob_num_ind(name_del: str, contacts: dict) ->int:
     ind = 0
     while True:
         mob_num_print(name_del, contacts, ind)
@@ -83,6 +84,28 @@ def mob_num_del(name_del: str, contacts: dict) ->int:
         if not action:
             return ind
 
+def mob_num_new(contacts: dict, name_modify: str) ->bool:
+
+    if type(contacts[name_modify]) == list:
+        while len(contacts[name_modify]):
+            mobile_ind = mob_num_ind(name_modify, contacts)
+
+            mob_num = input("\tnew mobile -> ")
+            if check_mob(mob_num):
+                continue
+            contacts[name_modify][mobile_ind] = mob_num
+
+            if not input("\n\tcontinue -> "):
+                os.system('CLS')
+                continue
+            return True
+    else:
+        while True:
+            mob_num = input("\tnew mobile -> ")
+            if check_mob(mob_num):
+                continue
+            contacts[name_modify] = mob_num
+            return True
 
 #=====================menu main functions==================#
 
@@ -109,7 +132,7 @@ def show_contacts(contacts: dict) ->None:
 
 def add_contacts(contacts: dict) ->None:
     while True:
-        print(" contact:")
+        print(" add contact:")
         arr_ph_num = []
         name_add = input("\tenter name -> ")
 
@@ -134,13 +157,37 @@ def add_contacts(contacts: dict) ->None:
 
     os.system('CLS')
 
-def modify_contacts(contacts: dict) ->dict:
-    print("func3")
-    exit_menu()
+def modify_contacts(contacts: dict) ->None:
+
+    while True:
+        print(" modify contact:")
+        name_search = search_name((input("\tname -> ")).lower(), contacts)
+
+        if not name_search:
+            print("\t is absent")
+        else:
+            if type(contacts[name_search]) == list:
+                print(name_search, ":")
+                for ph in contacts[name_search]:
+                    print("\t\t phone {}".format(ph))
+            else:
+                print("name {} : phone {}".format(name_search, contacts[name_search]))
+
+            name_modify = input("\n\tnew name -> ")
+            contacts[name_modify] = contacts.pop(name_search)  # new key
+
+            if mob_num_new(contacts, name_modify):
+                break
+
+        if not input("\n\tcontinue -> "):
+            os.system('CLS')
+            continue
+
+        break
 
 def search_contacts(contacts: dict) ->None:
     while True:
-        print(" contact:")
+        print(" search contact:")
         name_search = search_name((input("\tname -> ")).lower(), contacts)
 
         if not name_search:
@@ -166,7 +213,7 @@ def search_contacts(contacts: dict) ->None:
 
 def delete_contacts(contacts: dict) ->None:
     while True:
-        print(" contact:")
+        print(" delete contact:")
         name_del = search_name((input("\tname -> ")).lower(), contacts)
 
         if not name_del:
@@ -174,7 +221,7 @@ def delete_contacts(contacts: dict) ->None:
         else:
             if type(contacts[name_del]) == list:
                 while len(contacts[name_del]):
-                    del contacts[name_del][mob_num_del(name_del, contacts)]
+                    del contacts[name_del][mob_num_ind(name_del, contacts)]
                     print("mobile delete:")
                     if not input("\n\tcontinue -> "):
                         os.system('CLS')
