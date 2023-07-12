@@ -1,12 +1,10 @@
 import os
-import time
 
 #======================functions======================#
 
 def exit_menu():
     out_submenu = input("\texit -> ")
     if not out_submenu:
-        time.sleep(0)
         os.system('CLS')
         return True
 
@@ -106,7 +104,6 @@ def add_contacts(contacts: dict) ->None:
             continue
         break
 
-    time.sleep(0)
     os.system('CLS')
 
 def modify_contacts(contacts: dict) ->dict:
@@ -114,8 +111,29 @@ def modify_contacts(contacts: dict) ->dict:
     exit_menu()
 
 def search_contacts(contacts: dict) ->None:
-    print("func4")
-    exit_menu()
+    while True:
+        print(" contact:")
+        name_search = input("\tenter name -> ")
+        if contacts.get(name_search, False):
+            if type(contacts[name_search]) == dict:
+                print(name_search, ":")
+                for ph in contacts[name_search]:
+                    print("\t", ph, "\t", contacts[name_search][ph])
+            elif type(contacts[name_search]) == list:
+                print(name_search, ":")
+                for ph in contacts[name_search]:
+                    print("\t", ph)
+            else:
+                print("{} : {}".format(name_search, contacts[name_search]))
+        else:
+            print("\t\"{}\" is absent".format(name_search))
+
+        if not input("\n\tcontinue -> "):
+            os.system('CLS')
+            continue
+        break
+
+    os.system('CLS')
 
 def delete_contacts(contacts: dict) ->dict:
     print("func5")
@@ -147,7 +165,6 @@ while True:
     print_menu(menu_f, ind_menu)
     print(" \"w\" - Down, \"s\" - Up: ->", end='')
     ind_menu, operation = receive_pos(ind_menu)
-    time.sleep(0)
     os.system('CLS')
 
     if not operation:
