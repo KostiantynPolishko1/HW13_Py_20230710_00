@@ -42,7 +42,6 @@ def receive_pos(ind_pos: int=0) ->tuple:
 
         return ind_pos, direct
 
-#=====================menu functions==================#
 def check_mob(mobile: str) ->bool:
 
     if not mobile[0].isdigit() and mobile[0] != '+':
@@ -57,6 +56,16 @@ def check_mob(mobile: str) ->bool:
         ind += 1
 
     return False
+
+def search_name(name_search: str, contacts: dict) -> str:
+    for name in contacts:
+        name_temp = name.lower()
+        if name_temp.find(name_search) != -1:
+            return name
+        else:
+            return ''
+
+#=====================menu main functions==================#
 
 def show_contacts(contacts: dict) ->None:
     print("\tList", end='')
@@ -113,8 +122,11 @@ def modify_contacts(contacts: dict) ->dict:
 def search_contacts(contacts: dict) ->None:
     while True:
         print(" contact:")
-        name_search = input("\tenter name -> ")
-        if contacts.get(name_search, False):
+        name_search = search_name((input("\tname -> ")).lower(), contacts)
+
+        if not name_search:
+            print("\t\"{}\" is absent")
+        else:
             if type(contacts[name_search]) == dict:
                 print(name_search, ":")
                 for ph in contacts[name_search]:
@@ -125,8 +137,6 @@ def search_contacts(contacts: dict) ->None:
                     print("\t", ph)
             else:
                 print("{} : {}".format(name_search, contacts[name_search]))
-        else:
-            print("\t\"{}\" is absent".format(name_search))
 
         if not input("\n\tcontinue -> "):
             os.system('CLS')
@@ -135,9 +145,51 @@ def search_contacts(contacts: dict) ->None:
 
     os.system('CLS')
 
-def delete_contacts(contacts: dict) ->dict:
-    print("func5")
-    exit_menu()
+def delete_contacts(contacts: dict) ->None:
+    while True:
+        print(" contact:")
+        name_del = search_name((input("\tname -> ")).lower(), contacts)
+
+        if not name_del:
+            print("\t\tis absent!")
+        else:
+            if type(contacts[name_del]) == dict:
+                print(name_del, ":")
+                for ph in contacts[name_del]:
+                    print("\t", ph, "\t", contacts[name_del][ph])
+                while True:
+                    ph_type = input("enter type phone -> ")
+                    if contacts[name_del].get(ph_type, False):
+                        print("DELETE! ->", end='')
+                        print(ph_type, " : ", contacts[name_del][ph_type])
+                        del contacts[name_del][ph_type]
+                        break
+                    else:
+                        print("enter correct type as:")
+                        for i in contacts[name_del]:
+                            print("\t\t\t", i)
+                        continue
+            elif type(contacts[name_del]) == list:
+                ph_pos: int = 0
+                print(name_del, ":")
+                for ind in contacts[name_del]:
+                    ph_pos += 1
+                    print("\t\t", ph_pos, " -> ", ind)
+                while True:
+                    ph_num = int(input("enter phone Pos. delete -> "))
+                    if ph_num > ph_pos:
+                        print("\nN phone is out of range")
+                        continue
+                    print("DELETE! -> phone {}: {}".format(ph_num, contacts[name_del][ph_num - 1]))
+                    del contacts[name_del][ph_num - 1]
+                    break
+            else:
+                del contacts[name_del]
+
+        if not input("\n\tcontinue -> "):
+            os.system('CLS')
+            continue
+        break
 
 def exit_function(contacts: dict) ->bool:
     return True
