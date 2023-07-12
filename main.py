@@ -11,7 +11,7 @@ def exit_menu():
         return True
 
 def print_menu(dict_menu, ind_pos: int=0) ->None:
-    print("\n Menu:")
+    print("\n\tContacts\n Menu:")
     for i in range(len(dict_menu)):
         if i == ind_pos:
             print("-> {} {}".format(str(i+1) + '.', dict_menu[i][0]))
@@ -45,32 +45,83 @@ def receive_pos(ind_pos: int=0) ->tuple:
         return ind_pos, direct
 
 #=====================menu functions==================#
+def check_mob(mobile: str) ->bool:
 
-def show_contacts(data: dict) ->None:
-    while True:
-        print("func1")
-        if exit_menu():
-            break
-        time.sleep(0)
-        os.system('CLS')
+    if not mobile[0].isdigit() and mobile[0] != '+':
+        print("\n\tERROR!\n\tenter mob +...digit or 000...digit\n")
+        return True
 
-def add_contacts(data: dict) ->dict:
-    print("func2")
+    ind = 1
+    while ind < len(mobile):
+        if not mobile[ind].isdigit() and mobile[ind] != '-':
+            print("\n\tERROR!\n\tenter mob in digit num\n")
+            return True
+        ind += 1
+
+    return False
+
+def show_contacts(contacts: dict) ->None:
+    print("\tList", end='')
+    if not len(contacts):
+        print(" is empty", contacts)
+    else:
+        print(": ")
+        for name in sorted(contacts):
+            if type(contacts[name]) == dict:
+                print(name, ":")
+                for ph in contacts[name]:
+                    print("\t\t", ph, " -> ", contacts[name][ph])
+            elif type(contacts[name]) == list:
+                ind = 0
+                print(name, ":")
+                for ph in contacts[name]:
+                    ind += 1
+                    print("\t\t phone {} -> {}".format(ind, ph))
+            else:
+                print(name, " : ", contacts[name])
     exit_menu()
 
-def modify_contacts(data: dict) ->dict:
+def add_contacts(contacts: dict) ->None:
+    while True:
+        print(" contact:")
+        arr_ph_num = []
+        name_add = input("\tenter name -> ")
+
+        while True:  # check if number in digit format
+            mob_num = input("\tenter mob.num\t-> ")
+
+            if check_mob(mob_num):
+                continue
+
+            arr_ph_num.append(mob_num)
+            if not input("+mob? -> "):
+                continue
+
+            contacts[name_add] = arr_ph_num
+            os.system('CLS')
+            break
+
+        if not input("+name? -> "):
+            os.system('CLS')
+            continue
+        break
+
+    time.sleep(0)
+    os.system('CLS')
+
+def modify_contacts(contacts: dict) ->dict:
     print("func3")
     exit_menu()
 
-def search_contacts(data: dict) ->None:
+def search_contacts(contacts: dict) ->None:
     print("func4")
     exit_menu()
 
-def delete_contacts(data: dict) ->dict:
+def delete_contacts(contacts: dict) ->dict:
     print("func5")
     exit_menu()
 
-def exit_function(data: dict) ->bool:
+def exit_function(contacts: dict) ->bool:
     return True
 
 #========================main=========================#
@@ -78,7 +129,7 @@ def exit_function(data: dict) ->bool:
 ind_menu: int=0
 strTxt: str = ''
 #Data
-contacts = {"Kostiantyn": {"mob": "+38-073-340-90-97", "home": "+38-056-790-53-45", "work": "+38-044-750-23-40"},
+data = {"Kostiantyn": {"mob": "+38-073-340-90-97", "home": "+38-056-790-53-45", "work": "+38-044-750-23-40"},
             "Margarita": ["+38-096-835-60-27", "+38-096-440-19-46"],
             "Dariya": "+38-066-645-98-81"
 }
@@ -92,7 +143,6 @@ menu_f = {
     5: ["Exit",     exit_function   ]
 }
 
-print("\n\tContacts")
 while True:
     print_menu(menu_f, ind_menu)
     print(" \"w\" - Down, \"s\" - Up: ->", end='')
@@ -102,6 +152,6 @@ while True:
 
     if not operation:
         print("\n {} {}:".format(ind_menu + 1, menu_f[ind_menu][0])) if ind_menu < 5 else print("\tExit")
-        tempValue = menu_f[ind_menu][1](contacts)
+        tempValue = menu_f[ind_menu][1](data)
         if type(tempValue) == bool and tempValue:
             break
