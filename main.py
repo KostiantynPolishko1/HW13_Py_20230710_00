@@ -1,4 +1,5 @@
 import os
+import pickle
 
 #======================functions======================#
 
@@ -106,6 +107,27 @@ def mob_num_new(contacts: dict, name_modify: str) ->bool:
                 continue
             contacts[name_modify] = mob_num
             return True
+def file_readb(file_name: str) ->dict:
+    data_str: str
+    data_dict: dict
+
+    try:
+        with open((file_name + '.txt'), 'rb') as file:
+            data_str = pickle.load(file)
+    except FileNotFoundError:
+        print("ERROR! FILE ABSENT")
+    except Exception as FileNotWorkError:
+        print("ERROR! ABORD FILE READ")
+
+    data_dict = eval(data_str)
+    return data_dict
+
+def file_writeb(file_name: str, data_dict: dict) ->None:
+    with open((file_name + '.txt'), 'wb') as file:
+        try:
+            pickle.dump(str(data_dict), file)
+        except Exception as FileNotWorkError:
+            print("ERROR! ABORD FILE RECORD")
 
 #=====================menu main functions==================#
 
@@ -241,31 +263,36 @@ def exit_function(contacts: dict) ->bool:
 
 #========================main=========================#
 
-ind_menu: int=0
-strTxt: str = ''
-#Data
-data = {"Kostiantyn": ["+38-073-340-90-97", "+38-056-790-53-45", "+38-044-750-23-40"],
-         "Margarita": ["+38-096-835-60-27", "+38-096-440-19-46"],
-         "Dariya": "+38-066-645-98-81"
-}
+if __name__ == '__main__':
+    ind_menu: int = 0
+    strTxt: str = ''
+    f_name = 'contacts'
+    data: dict
 
-menu_f = {
-    0: ["show",     show_contacts   ],
-    1: ["add",      add_contacts    ],
-    2: ["modify",   modify_contacts ],
-    3: ["search",   search_contacts ],
-    4: ["delete",   delete_contacts ],
-    5: ["Exit",     exit_function   ]
-}
+    data = file_readb(f_name)
 
-while True:
-    print_menu(menu_f, ind_menu)
-    print(" \"w\" - Down, \"s\" - Up: ->", end='')
-    ind_menu, operation = receive_pos(ind_menu, len(menu_f)-1)
-    os.system('CLS')
+    menu_f = {
+        0: ["show",     show_contacts   ],
+        1: ["add",      add_contacts    ],
+        2: ["modify",   modify_contacts ],
+        3: ["search",   search_contacts ],
+        4: ["delete",   delete_contacts ],
+        5: ["Exit",     exit_function   ]
+    }
 
-    if not operation:
-        print("\n {} {}:".format(ind_menu + 1, menu_f[ind_menu][0])) if ind_menu < 5 else print("\tExit")
-        tempValue = menu_f[ind_menu][1](data)
-        if type(tempValue) == bool and tempValue:
-            break
+    while True:
+        print_menu(menu_f, ind_menu)
+        print(" \"w\" - Down, \"s\" - Up: ->", end='')
+        ind_menu, operation = receive_pos(ind_menu, len(menu_f)-1)
+        os.system('CLS')
+
+        if not operation:
+            print("\n {} {}:".format(ind_menu + 1, menu_f[ind_menu][0])) if ind_menu < 5 else print("\tExit")
+            tempValue = menu_f[ind_menu][1](data)
+            if type(tempValue) == bool and tempValue:
+                break
+
+    file_writeb(f_name, data)
+
+else:
+    print('ERROR!\nApplication is not loaded!')
